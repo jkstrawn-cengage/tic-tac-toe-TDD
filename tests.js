@@ -60,8 +60,8 @@ describe('tic tac toe', function() {
 		manager.placeTokenOnSquare('X', 2, 0);
 		expect(manager.isThereAWinner()).toEqual("X");
 	});
-
-	it('places the computer token in the middle if it is the last spot (depth: 0)', function() {
+	
+	it('places the computer token in the middle if it is the last spot (depth: 1)', function() {
 		console.log('places the computer token in the middle if it is the last spot (depth: 0)');
 		manager.initiate();
 		manager.placeTokenOnSquare('O', 0, 2);
@@ -90,20 +90,6 @@ describe('tic tac toe', function() {
 		expect(manager.isThereAWinner()).toEqual('O');
 	});
 
-	it('places the computer token in the not-losing square with 2 squares open (1st square, depth: 2)', function() {
-		console.log('places the computer token in the not-losing square with 2 squares open (1st square, depth: 2)');
-		manager.initiate();
-		manager.placeTokenOnSquare('X', 0, 0);
-		manager.placeTokenOnSquare('O', 1, 0);
-		manager.placeTokenOnSquare('X', 0, 1);
-		manager.placeTokenOnSquare('O', 1, 1);
-		manager.placeTokenOnSquare('X', 1, 2);
-		manager.placeTokenOnSquare('O', 2, 1);
-		manager.placeTokenOnSquare('X', 2, 0);
-		manager.makeComputerMove();
-		expect(manager.getTokenAtSquare(0, 2)).toEqual('O');
-	});
-
 	it('places the computer token in the winning-square with 3 squares open (depth: 1)', function() {
 		console.log('places the computer token in the winning square with 3 squares open (depth: 1)');
 		manager.initiate();
@@ -113,6 +99,20 @@ describe('tic tac toe', function() {
 		manager.placeTokenOnSquare('X', 1, 0);
 		manager.placeTokenOnSquare('O', 2, 2);
 		manager.placeTokenOnSquare('X', 2, 1);
+		manager.makeComputerMove();
+		expect(manager.getTokenAtSquare(0, 2)).toEqual('O');
+	});
+
+	it('places the computer token in the not-losing-square with 2 squares open (1st square, depth: 2)', function() {
+		console.log('places the computer token in the not-losing square with 2 squares open (1st square, depth: 2)');
+		manager.initiate();
+		manager.placeTokenOnSquare('X', 0, 0);
+		manager.placeTokenOnSquare('O', 1, 0);
+		manager.placeTokenOnSquare('X', 0, 1);
+		manager.placeTokenOnSquare('O', 1, 1);
+		manager.placeTokenOnSquare('X', 1, 2);
+		manager.placeTokenOnSquare('O', 2, 1);
+		manager.placeTokenOnSquare('X', 2, 0);
 		manager.makeComputerMove();
 		expect(manager.getTokenAtSquare(0, 2)).toEqual('O');
 	});
@@ -131,17 +131,50 @@ describe('tic tac toe', function() {
 		expect(manager.getTokenAtSquare(2, 0)).toEqual('O');
 	});
 
-	it('places the computer token in future-winning-square in 2 moves with 4 open (depth: 3)', function() {
-		console.log('places the computer token in future winning square in 2 moves with 4 open (depth: 3)');
+	it('places the human token in the not-losing square with 2 squares open (2nd square, depth: 2)', function() {
+		console.log('places the human token in the not-losing square with 2 squares open (2nd square, depth: 2)');
 		manager.initiate();
+		manager.placeTokenOnSquare('O', 0, 0);
 		manager.placeTokenOnSquare('X', 0, 1);
-		manager.placeTokenOnSquare('O', 1, 1);
-		manager.placeTokenOnSquare('X', 1, 0);
-		manager.placeTokenOnSquare('O', 1, 2);
-		manager.placeTokenOnSquare('X', 2, 1);
-		console.log("BORKEN *****************************************************************");
-		manager.makeComputerMove();
-		expect(manager.getTokenAtSquare(0, 2)).toEqual('O');
+		manager.placeTokenOnSquare('O', 0, 2);
+		manager.placeTokenOnSquare('X', 1, 1);
+		manager.placeTokenOnSquare('O', 1, 0);
+		manager.placeTokenOnSquare('X', 2, 2);
+		manager.placeTokenOnSquare('O', 2, 1);
+		manager.makeHumanMove();
+		expect(manager.getTokenAtSquare(2, 0)).toEqual('X');
 	});
 
+	it('places the human token in the not-losing-square with 2 squares open (1st square, depth: 2)', function() {
+		console.log('places the human token in the not-losing square with 2 squares open (1st square, depth: 2)');
+		manager.initiate();
+		manager.placeTokenOnSquare('O', 0, 0);
+		manager.placeTokenOnSquare('X', 1, 0);
+		manager.placeTokenOnSquare('O', 0, 1);
+		manager.placeTokenOnSquare('X', 1, 1);
+		manager.placeTokenOnSquare('O', 1, 2);
+		manager.placeTokenOnSquare('X', 2, 1);
+		manager.placeTokenOnSquare('O', 2, 0);
+		manager.makeHumanMove();
+		expect(manager.getTokenAtSquare(0, 2)).toEqual('X');
+	});
+
+	it('has the computer win with the human making 1 bad moves (depth: 5)', function() {
+		console.log('has the computer win with the human making 1 bad moves (depth: 5)');
+		manager.initiate();
+		manager.placeTokenOnSquare('O', 0, 0);
+		manager.placeTokenOnSquare('X', 0, 1);
+		manager.makeComputerMove();
+		manager.makeHumanMove();
+		manager.makeComputerMove();
+		manager.makeHumanMove();
+		manager.makeComputerMove();
+		expect(manager.isThereAWinner()).toEqual('O');
+	});
+
+	it('has two players with tokens', function() {
+		manager.initiate();
+		expect(manager.getPlayer(1).getToken()).toEqual('X');
+		expect(manager.getPlayer(2).getToken()).toEqual('O');
+	});
 });

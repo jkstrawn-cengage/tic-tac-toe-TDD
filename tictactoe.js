@@ -1,9 +1,12 @@
 var Manager = function() {
 	this.board = [];
+	this.players = [];
 
 	this.initiate = function() {
 		this.board = new Board();
 		this.board.initialize();
+		this.players.push(new Player("X"));
+		this.players.push(new Player("O"));
 	}
 
 	this.placeTokenOnSquare = function(token, x, y) {
@@ -15,77 +18,53 @@ var Manager = function() {
 	}
 
 	this.makeComputerMove = function() {
-		var result = oPlaysAtBestSquare(this.board, 1);
-		var square = result.square;
-		this.board.setToken("O", square.x, square.y);
-		console.log("made move at (" + square.x + ", " + square.y + ")");
+		var result = minimax(this.board, this.getPlayer(2).getToken());
+		this.placeTokenOnSquare("O", result.square.x, result.square.y);
 	}
 
+	this.makeHumanMove = function() {
+		var result = minimax(this.board, this.getPlayer(1).getToken());
+		this.placeTokenOnSquare("X", result.square.x, result.square.y);
+	}
 
 	this.isThereAWinner = function() {
 		return this.board.isThereAWinner();
 	}
+
+	this.getPlayer = function(idInArray) {
+		return this.players[idInArray - 1];
+	}
 }
 
-var oPlaysAtBestSquare = function(board, depth) {
+var minimax = function(board, token) {
 	if (board.isGameOver()) {
-		if (board.isThereAWinner() == "X") {
-			return {score: -1};
-		} else if (board.isThereAWinner() == "O") {
-			return {score: 1};
-		} else {
-			return {score: 0};
-		}
-	}
-	var emptySquares = board.getEmptySquares();
-	var bestSquare = {score: -1};
-
-	for (var i = 0; i < emptySquares.length; i++) {
-		var thisSquare = emptySquares[i];
-		var clonedBoard = board.clone();
-		clonedBoard.setToken("O", thisSquare.x, thisSquare.y);
-		console.log("Assuming O played at... " + thisSquare.x + ", " + thisSquare.y);
-		var result = xPlaysAtBestSquare(clonedBoard);
-		if (result.score >= bestSquare.score) {
-			if (depth == 2) {
-				console.log("Set new best square: Score = (" + result.score + "), old = (" + bestSquare.score);
-				console.log("O goes at (" + thisSquare.x + ", " + thisSquare.y + ")");
-				if (result.square) console.log("X goes at (" + result.square.x + ", " + result.square.y + ")");
-			}
-			bestSquare =  {square: thisSquare, score: result.score};
-		}		
-	}
-	return bestSquare;
-}
-
-var xPlaysAtBestSquare = function(board) {
-	if (board.isGameOver()) {
-		console.log("game over");
 		if (board.isThereAWinner() == "O") {
 			return {score: 1};
+		} else if (board.isThereAWinner() == "X") {
+			return {score: -1};
 		} else {
 			return {score: 0};
 		}
 	}
+	var modifier = (token == "X") ? -1: 1;
+	var otherToken = (token == "X") ? "O" : "X";
+
 	var emptySquares = board.getEmptySquares();
-	var bestSquare = {score: 1};
-	
-	for (var k = 0; k < emptySquares.length; k++) {
-		var thisSquare = emptySquares[k];
+	var bestSquareAndScore = {score: -1};
+
+	for (var i = 0; i < emptySquares.length; i++) {
+		var _square = emptySquares[i];
 		var clonedBoard = board.clone();
-		clonedBoard.setToken("X", thisSquare.x, thisSquare.y);
-		var result = oPlaysAtBestSquare(clonedBoard);
-		if (result.square) {
-			//console.log("Option: " + result.score + " at (" + result.square.x + ", " + result.square.y + ")");
-			//clonedBoard.print();
+		clonedBoard.setToken(token, _square.x, _square.y);
+		var possibleBestScore = minimax(clonedBoard, otherToken).score;
+		possibleBestScore *= modifier;
+		if (possibleBestScore >= bestSquareAndScore.score) {
+			bestSquareAndScore = {square: _square, score: possibleBestScore};
 		}
-		if (result.score <= bestSquare.score) {
-			bestSquare = {square: thisSquare, score: result.score};	
-		}		
 	}
-	console.log("Best square for X was... (" + bestSquare.square.x + ", " + bestSquare.square.y + ")");
-	bestSquare.score *= .9;
-	return bestSquare;
+
+	bestSquareAndScore.score *= .9 * modifier;
+	return bestSquareAndScore;
 }
 
 var Square = function(x, y) {
@@ -199,5 +178,13 @@ var Board = function() {
 		}
 		console.log("winner: ",this.isThereAWinner());
 		console.log("-----------------");
+	}
+}
+
+var Player = function(_token) {
+	this.token = _token;
+
+	this.getToken = function() {
+		return this.token;
 	}
 }
