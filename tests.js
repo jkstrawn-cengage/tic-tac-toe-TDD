@@ -67,7 +67,7 @@ describe('tic tac toe', function() {
 		manager.makeComputerMove();
 		expect(manager.getTokenAtSquare(1, 1)).toEqual('O');
 	});
-/*
+
 	it('places the computer token in the winning square with 2 squares open (depth: 1)', function() {
 		manager.initiate();
 		manager.placeTokenOnSquare('X', 2, 0);
@@ -80,5 +80,18 @@ describe('tic tac toe', function() {
 		manager.makeComputerMove();
 		expect(manager.isThereAWinner()).toEqual('O');
 	});
-*/
+
+	it('places the computer token in the not-losing square with 2 squares open (depth: 2)', function() {
+		manager.initiate();
+		manager.placeTokenOnSquare('X', 0, 0);
+		manager.placeTokenOnSquare('O', 0, 1);
+		manager.placeTokenOnSquare('X', 0, 2);
+		manager.placeTokenOnSquare('O', 1, 1);
+		manager.placeTokenOnSquare('X', 1, 0);
+		manager.placeTokenOnSquare('O', 2, 2);
+		manager.placeTokenOnSquare('X', 2, 1);
+		manager.makeComputerMove();
+		expect(manager.getTokenAtSquare(2, 0)).toEqual('O');
+	});
+
 });

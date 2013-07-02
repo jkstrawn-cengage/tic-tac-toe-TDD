@@ -23,6 +23,39 @@ var Manager = function() {
 		});
 		if (emptySquares.length == 1) {
 			emptySquares[0].setToken("O");
+		} else {
+			var winningSquare = false;
+			var tieSquare = false;
+			for (var i = 0; i < emptySquares.length; i++) {
+				var thisSquare = emptySquares[i];
+				var clonedBoard = this.board.clone();
+				clonedBoard.setToken("O", thisSquare.x, thisSquare.y);
+				if (clonedBoard.isThereAWinner() == "O") {
+					winningSquare = thisSquare;
+				} else {
+					var emptySquares2 = clonedBoard.forEach(function(square){
+						if (square.isEmpty()) {
+							return square;
+						}
+						return false;
+					});
+					for (var k = 0; k < emptySquares2.length; k++) {
+						var thisSecondSquare = emptySquares2[k];
+						var secondClonedBoard = clonedBoard.clone();
+						secondClonedBoard.setToken("X", thisSecondSquare.x, thisSecondSquare.y);
+						if (secondClonedBoard.isThereAWinner() != "O") {
+							tieSquare = thisSquare;
+						}
+					}			
+				}
+	
+			}
+			if (winningSquare) {
+				this.board.setToken("O", winningSquare.x, winningSquare.y);
+			} else if (tieSquare) {
+				this.board.setToken("O", tieSquare.x, tieSquare.y);
+			}
+
 		}
 	}
 
@@ -100,5 +133,30 @@ var Board = function() {
 			return winner;
 		}
 		return false;
+	}
+
+	this.clone = function() {
+		var newBoard = new Board();
+		newBoard.initialize();
+		this.forEach(function(square) {
+			newBoard.setToken(square.token, square.x, square.y);
+		});
+		return newBoard;
+	}
+
+	this.print = function() {
+		for (var x = 0; x < 3; x++) {
+			var row = "";
+			for (var y = 0; y < 3; y++) {
+				if (this.squares[x][y].token == "") {
+					row += "  ";
+				} else {
+					row += this.squares[x][y].token + " ";
+				}
+			}
+			console.log(row);
+		}
+		console.log("winner: ",this.isThereAWinner());
+		console.log("-----------------");
 	}
 }
