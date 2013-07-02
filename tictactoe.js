@@ -15,53 +15,55 @@ var Manager = function() {
 	}
 
 	this.makeComputerMove = function() {
-		var emptySquares = this.board.forEach(function(square){
-			if (square.isEmpty()) {
-				return square;
-			}
-			return false;
-		});
-		if (emptySquares.length == 1) {
-			emptySquares[0].setToken("O");
-		} else {
-			var winningSquare = false;
-			var tieSquare = false;
-			for (var i = 0; i < emptySquares.length; i++) {
-				var thisSquare = emptySquares[i];
-				var clonedBoard = this.board.clone();
-				clonedBoard.setToken("O", thisSquare.x, thisSquare.y);
-				if (clonedBoard.isThereAWinner() == "O") {
-					winningSquare = thisSquare;
-				} else {
-					var emptySquares2 = clonedBoard.forEach(function(square){
-						if (square.isEmpty()) {
-							return square;
-						}
-						return false;
-					});
-					for (var k = 0; k < emptySquares2.length; k++) {
-						var thisSecondSquare = emptySquares2[k];
-						var secondClonedBoard = clonedBoard.clone();
-						secondClonedBoard.setToken("X", thisSecondSquare.x, thisSecondSquare.y);
-						if (secondClonedBoard.isThereAWinner() != "O") {
-							tieSquare = thisSquare;
-						}
-					}			
-				}
-	
-			}
-			if (winningSquare) {
-				this.board.setToken("O", winningSquare.x, winningSquare.y);
-			} else if (tieSquare) {
-				this.board.setToken("O", tieSquare.x, tieSquare.y);
-			}
-
-		}
+		var square = playThoughGameAndGetWinningSquare(this.board);
+		this.board.setToken("O", square.x, square.y);
 	}
+
 
 	this.isThereAWinner = function() {
 		return this.board.isThereAWinner();
 	}
+}
+
+var playThoughGameAndGetWinningSquare = function(board, thisSquare) {
+	var emptySquares = board.getEmptySquares();
+	if (emptySquares.length == 1) {
+		return emptySquares[0];
+	}
+
+	var bestSquare = false;
+	for (var i = 0; i < emptySquares.length; i++) {
+		var thisSquare = emptySquares[i];
+		var clonedBoard = board.clone();
+		clonedBoard.setToken("O", thisSquare.x, thisSquare.y);
+		if (clonedBoard.isThereAWinner() == "O") {
+			return thisSquare;
+		} else {
+			bestSquare = playThoughGameAndGetNotLosingSquare(clonedBoard, thisSquare);
+		}
+	}
+	if (bestSquare) {
+		return bestSquare;
+	}
+}
+
+var playThoughGameAndGetNotLosingSquare = function(board, thisSquare) {
+	console.log("get not losing square");
+	board.print();
+	var emptySquares = board.getEmptySquares();
+	if (emptySquares.length == 1) {
+		return thisSquare;
+	}
+	/*
+	for (var k = 0; k < emptySquares.length; k++) {
+		var thisSecondSquare = emptySquares[k];
+		var clonedBoard = board.clone();
+		clonedBoard.setToken("X", thisSecondSquare.x, thisSecondSquare.y);
+		if (clonedBoard.isThereAWinner() != "O") {
+			return thisSquare;
+		}
+	}
+	*/
 }
 
 var Square = function(x, y) {
@@ -142,6 +144,15 @@ var Board = function() {
 			newBoard.setToken(square.token, square.x, square.y);
 		});
 		return newBoard;
+	}
+
+	this.getEmptySquares = function() {
+		return this.forEach(function(square){
+			if (square.isEmpty()) {
+				return square;
+			}
+			return false;
+		});
 	}
 
 	this.print = function() {
