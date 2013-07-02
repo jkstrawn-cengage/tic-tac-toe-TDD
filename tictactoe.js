@@ -15,8 +15,10 @@ var Manager = function() {
 	}
 
 	this.makeComputerMove = function() {
-		var square = playThoughGameAndGetWinningSquare(this.board);
+		var result = oPlaysAtBestSquare(this.board, 1);
+		var square = result.square;
 		this.board.setToken("O", square.x, square.y);
+		console.log("made move at (" + square.x + ", " + square.y + ")");
 	}
 
 
@@ -25,45 +27,65 @@ var Manager = function() {
 	}
 }
 
-var playThoughGameAndGetWinningSquare = function(board, thisSquare) {
-	var emptySquares = board.getEmptySquares();
-	if (emptySquares.length == 1) {
-		return emptySquares[0];
+var oPlaysAtBestSquare = function(board, depth) {
+	if (board.isGameOver()) {
+		if (board.isThereAWinner() == "X") {
+			return {score: -1};
+		} else if (board.isThereAWinner() == "O") {
+			return {score: 1};
+		} else {
+			return {score: 0};
+		}
 	}
+	var emptySquares = board.getEmptySquares();
+	var bestSquare = {score: -1};
 
-	var bestSquare = false;
 	for (var i = 0; i < emptySquares.length; i++) {
 		var thisSquare = emptySquares[i];
 		var clonedBoard = board.clone();
 		clonedBoard.setToken("O", thisSquare.x, thisSquare.y);
-		if (clonedBoard.isThereAWinner() == "O") {
-			return thisSquare;
-		} else {
-			bestSquare = playThoughGameAndGetNotLosingSquare(clonedBoard, thisSquare);
-		}
+		console.log("Assuming O played at... " + thisSquare.x + ", " + thisSquare.y);
+		var result = xPlaysAtBestSquare(clonedBoard);
+		if (result.score >= bestSquare.score) {
+			if (depth == 2) {
+				console.log("Set new best square: Score = (" + result.score + "), old = (" + bestSquare.score);
+				console.log("O goes at (" + thisSquare.x + ", " + thisSquare.y + ")");
+				if (result.square) console.log("X goes at (" + result.square.x + ", " + result.square.y + ")");
+			}
+			bestSquare =  {square: thisSquare, score: result.score};
+		}		
 	}
-	if (bestSquare) {
-		return bestSquare;
-	}
+	return bestSquare;
 }
 
-var playThoughGameAndGetNotLosingSquare = function(board, thisSquare) {
-	console.log("get not losing square");
-	board.print();
-	var emptySquares = board.getEmptySquares();
-	if (emptySquares.length == 1) {
-		return thisSquare;
-	}
-	/*
-	for (var k = 0; k < emptySquares.length; k++) {
-		var thisSecondSquare = emptySquares[k];
-		var clonedBoard = board.clone();
-		clonedBoard.setToken("X", thisSecondSquare.x, thisSecondSquare.y);
-		if (clonedBoard.isThereAWinner() != "O") {
-			return thisSquare;
+var xPlaysAtBestSquare = function(board) {
+	if (board.isGameOver()) {
+		console.log("game over");
+		if (board.isThereAWinner() == "O") {
+			return {score: 1};
+		} else {
+			return {score: 0};
 		}
 	}
-	*/
+	var emptySquares = board.getEmptySquares();
+	var bestSquare = {score: 1};
+	
+	for (var k = 0; k < emptySquares.length; k++) {
+		var thisSquare = emptySquares[k];
+		var clonedBoard = board.clone();
+		clonedBoard.setToken("X", thisSquare.x, thisSquare.y);
+		var result = oPlaysAtBestSquare(clonedBoard);
+		if (result.square) {
+			//console.log("Option: " + result.score + " at (" + result.square.x + ", " + result.square.y + ")");
+			//clonedBoard.print();
+		}
+		if (result.score <= bestSquare.score) {
+			bestSquare = {square: thisSquare, score: result.score};	
+		}		
+	}
+	console.log("Best square for X was... (" + bestSquare.square.x + ", " + bestSquare.square.y + ")");
+	bestSquare.score *= .9;
+	return bestSquare;
 }
 
 var Square = function(x, y) {
@@ -153,6 +175,14 @@ var Board = function() {
 			}
 			return false;
 		});
+	}
+
+	this.isGameOver = function() {
+		var emptySquares = this.getEmptySquares();
+		if (emptySquares.length == 0 || this.isThereAWinner()) {
+			return true;
+		}
+		return false;
 	}
 
 	this.print = function() {
