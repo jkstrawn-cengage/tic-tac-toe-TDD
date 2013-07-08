@@ -1,12 +1,18 @@
 var Manager = function() {
 	this.board = [];
 	this.players = [];
+	this.currentPlayer = null;
 
-	this.initiate = function() {
+	this.initiate = function(firstPlayerNumber) {
 		this.board = new Board();
 		this.board.initialize();
-		this.players.push(new Player("X"));
-		this.players.push(new Player("O"));
+		this.players.push(new Human(this, "X"));
+		this.players.push(new Computer(this, "O")); 
+		this.currentPlayer = this.getPlayer(firstPlayerNumber || 1);
+	}
+
+	this.startGame = function() {
+		this.makeCurrentPlayerTakeTurn();
 	}
 
 	this.placeTokenOnSquare = function(token, x, y) {
@@ -31,8 +37,43 @@ var Manager = function() {
 		return this.board.isThereAWinner();
 	}
 
-	this.getPlayer = function(idInArray) {
-		return this.players[idInArray - 1];
+	this.getPlayer = function(playerNumber) {
+		return this.players[playerNumber - 1];
+	}
+
+	this.getCurrentPlayer = function() {
+		return this.currentPlayer;
+	}
+
+	this.makeCurrentPlayerTakeTurn = function() {
+		this.currentPlayer.takeTurn();
+	}
+
+	this.sendHumanMove = function(x, y) {
+		this.currentPlayer.makeMove(x, y);
+	}
+	
+	this.nextPlayersTurn = function() {
+		if (!this.isGameOver()) {
+			this.currentPlayer = this.getOtherPlayer();
+			this.makeCurrentPlayerTakeTurn();
+		}
+	}
+
+	this.getOtherPlayer = function() {
+		if (this.currentPlayer.getToken() == this.getPlayer(1).getToken()) {
+			return this.getPlayer(2);
+		} else {
+			return this.getPlayer(1);
+		}
+	}
+
+	this.getBoard = function() {
+		return this.board.squares;
+	}
+
+	this.isGameOver = function() {
+		return this.board.isGameOver();
 	}
 }
 
@@ -181,10 +222,41 @@ var Board = function() {
 	}
 }
 
-var Player = function(_token) {
+var Player = function(_game, _token) {
+	this.game = _game;
 	this.token = _token;
 
 	this.getToken = function() {
 		return this.token;
+	}
+
+	this.takeTurn = function() {}
+
+	this.makeMove = function() {}
+}
+
+var Computer = function(game, token) {
+	this.prototype = new Player();
+	Player.call(this, game, token);
+
+	this.takeTurn = function() {
+		console.log("computer take turn");
+		this.game.makeComputerMove();
+		this.game.nextPlayersTurn();
+	}
+}
+
+var Human = function(game, token) {
+	this.prototype = new Player();
+	Player.call(this, game, token);
+
+	this.takeTurn = function() {
+		console.log("human take turn");
+		//notify the UI that it is this players turn
+	}
+
+	this.makeMove = function(x, y) {
+		this.game.placeTokenOnSquare(this.token, x, y);
+		this.game.nextPlayersTurn();
 	}
 }

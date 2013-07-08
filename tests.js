@@ -6,28 +6,28 @@ describe('tic tac toe', function() {
 	});
 
 	it('has a token on the top left square of the board when X chooses that location', function() {
-		console.log('has a token on the top left square of the board when X chooses that location');
+		console.log('TEST: has a token on the top left square of the board when X chooses that location');
 		manager.initiate();
 		manager.placeTokenOnSquare('X', 0, 0);
 		expect(manager.getTokenAtSquare(0, 0)).toEqual("X");
 	});
 
 	it('has an X token on the middle square of the board when X chooses that location', function() {
-		console.log('has an X token on the middle square of the board when X chooses that location');
+		console.log('TEST: has an X token on the middle square of the board when X chooses that location');
 		manager.initiate();
 		manager.placeTokenOnSquare('X', 1, 1);
 		expect(manager.getTokenAtSquare(1, 1)).toEqual("X");
 	});
 
 	it('has an O token on the middle square of the board when O chooses that location', function() {
-		console.log('has an O token on the middle square of the board when O chooses that location');
+		console.log('TEST: has an O token on the middle square of the board when O chooses that location');
 		manager.initiate();
 		manager.placeTokenOnSquare('O', 1, 1);
 		expect(manager.getTokenAtSquare(1, 1)).toEqual("O");
 	});
 
 	it('interprets no win with only one X token on the board', function() {
-		console.log('interprets no win with only one X token on the board');
+		console.log('TEST: interprets no win with only one X token on the board');
 		manager.initiate();
 		manager.placeTokenOnSquare('X', 0, 0);
 		manager.placeTokenOnSquare('O', 0, 1);
@@ -35,7 +35,7 @@ describe('tic tac toe', function() {
 	});
 
 	it('interprets X as the winner if X has three tokens on top', function() {
-		console.log('interprets X as the winner if X has three tokens on top');
+		console.log('TEST: interprets X as the winner if X has three tokens on top');
 		manager.initiate();
 		manager.placeTokenOnSquare('X', 0, 0);
 		manager.placeTokenOnSquare('X', 0, 1);
@@ -44,7 +44,7 @@ describe('tic tac toe', function() {
 	});
 
 	it('interprets X as the winner if X has three tokens on bottom', function() {
-		console.log('interprets X as the winner if X has three tokens on bottom');
+		console.log('TEST: interprets X as the winner if X has three tokens on bottom');
 		manager.initiate();
 		manager.placeTokenOnSquare('X', 2, 0);
 		manager.placeTokenOnSquare('X', 2, 1);
@@ -53,7 +53,7 @@ describe('tic tac toe', function() {
 	});
 
 	it('interprets X as the winner if X has reverse diagonal', function() {
-		console.log('interprets X as the winner if X has reverse diagonal');
+		console.log('TEST: interprets X as the winner if X has reverse diagonal');
 		manager.initiate();
 		manager.placeTokenOnSquare('X', 0, 2);
 		manager.placeTokenOnSquare('X', 1, 1);
@@ -62,7 +62,7 @@ describe('tic tac toe', function() {
 	});
 	
 	it('places the computer token in the middle if it is the last spot (depth: 1)', function() {
-		console.log('places the computer token in the middle if it is the last spot (depth: 0)');
+		console.log('TEST: places the computer token in the middle if it is the last spot (depth: 0)');
 		manager.initiate();
 		manager.placeTokenOnSquare('O', 0, 2);
 		manager.placeTokenOnSquare('X', 1, 2);
@@ -77,7 +77,7 @@ describe('tic tac toe', function() {
 	});
 
 	it('places the computer token in the winning-square with 2 squares open (depth: 1)', function() {
-		console.log('places the computer token in the winning square with 2 squares open (depth: 1)');
+		console.log('TEST: places the computer token in the winning square with 2 squares open (depth: 1)');
 		manager.initiate();
 		manager.placeTokenOnSquare('X', 2, 0);
 		manager.placeTokenOnSquare('O', 1, 1);
@@ -91,7 +91,7 @@ describe('tic tac toe', function() {
 	});
 
 	it('places the computer token in the winning-square with 3 squares open (depth: 1)', function() {
-		console.log('places the computer token in the winning square with 3 squares open (depth: 1)');
+		console.log('TEST: places the computer token in the winning square with 3 squares open (depth: 1)');
 		manager.initiate();
 		manager.placeTokenOnSquare('O', 1, 1);
 		manager.placeTokenOnSquare('X', 0, 0);
@@ -104,7 +104,7 @@ describe('tic tac toe', function() {
 	});
 
 	it('places the computer token in the not-losing-square with 2 squares open (1st square, depth: 2)', function() {
-		console.log('places the computer token in the not-losing square with 2 squares open (1st square, depth: 2)');
+		console.log('TEST: places the computer token in the not-losing square with 2 squares open (1st square, depth: 2)');
 		manager.initiate();
 		manager.placeTokenOnSquare('X', 0, 0);
 		manager.placeTokenOnSquare('O', 1, 0);
@@ -118,7 +118,7 @@ describe('tic tac toe', function() {
 	});
 
 	it('places the computer token in the not-losing square with 2 squares open (2nd square, depth: 2)', function() {
-		console.log('places the computer token in the not-losing square with 2 squares open (2nd square, depth: 2)');
+		console.log('TEST: places the computer token in the not-losing square with 2 squares open (2nd square, depth: 2)');
 		manager.initiate();
 		manager.placeTokenOnSquare('X', 0, 0);
 		manager.placeTokenOnSquare('O', 0, 1);
@@ -132,7 +132,7 @@ describe('tic tac toe', function() {
 	});
 
 	it('places the human token in the not-losing square with 2 squares open (2nd square, depth: 2)', function() {
-		console.log('places the human token in the not-losing square with 2 squares open (2nd square, depth: 2)');
+		console.log('TEST: places the human token in the not-losing square with 2 squares open (2nd square, depth: 2)');
 		manager.initiate();
 		manager.placeTokenOnSquare('O', 0, 0);
 		manager.placeTokenOnSquare('X', 0, 1);
@@ -146,7 +146,7 @@ describe('tic tac toe', function() {
 	});
 
 	it('places the human token in the not-losing-square with 2 squares open (1st square, depth: 2)', function() {
-		console.log('places the human token in the not-losing square with 2 squares open (1st square, depth: 2)');
+		console.log('TEST: places the human token in the not-losing square with 2 squares open (1st square, depth: 2)');
 		manager.initiate();
 		manager.placeTokenOnSquare('O', 0, 0);
 		manager.placeTokenOnSquare('X', 1, 0);
@@ -160,7 +160,7 @@ describe('tic tac toe', function() {
 	});
 
 	it('has the computer win with the human making 1 bad moves (depth: 5)', function() {
-		console.log('has the computer win with the human making 1 bad moves (depth: 5)');
+		console.log('TEST: has the computer win with the human making 1 bad moves (depth: 5)');
 		manager.initiate();
 		manager.placeTokenOnSquare('O', 0, 0);
 		manager.placeTokenOnSquare('X', 0, 1);
@@ -177,4 +177,33 @@ describe('tic tac toe', function() {
 		expect(manager.getPlayer(1).getToken()).toEqual('X');
 		expect(manager.getPlayer(2).getToken()).toEqual('O');
 	});
+
+	it('returns an X token for the current player if the human starts first', function() {
+		console.log('TEST: returns an X token for the current player if the human starts first');
+		manager.initiate(1);
+		expect(manager.getCurrentPlayer().getToken()).toEqual("X");
+	});
+
+	it('returns an O token for the current player if the computer starts first', function() {
+		console.log('TEST: returns an O token for the current player if the computer starts first');
+		manager.initiate(2);
+		expect(manager.getCurrentPlayer().getToken()).toEqual("O");
+	});
+
+	it('allows the first player to make a move when the game starts', function() {
+		console.log('TEST: allows the first player to make a move when the game starts');
+		manager.initiate(1);
+		manager.startGame();
+		manager.sendHumanMove(0, 0);
+		expect(manager.getTokenAtSquare(0, 0)).toEqual("X");
+	});
+
+	it('makes the computer take a move after the human plays first', function() {
+		console.log('TEST: makes the computer take a move after the human plays first');
+		manager.initiate(1);
+		manager.startGame();
+		manager.sendHumanMove(0, 0);
+		expect(manager.getTokenAtSquare(1, 1)).toEqual("O");
+	});
+
 });
