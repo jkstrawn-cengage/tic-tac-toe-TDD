@@ -2,10 +2,12 @@ var Manager = function() {
 	this.board = [];
 	this.players = [];
 	this.currentPlayer = null;
+	this.minimax = null;
 
 	this.initiate = function(firstPlayerNumber) {
 		this.board = new Board();
 		this.board.initialize();
+		this.minimax = new Minimax(this);
 		this.players.push(new Human(this, "X"));
 		this.players.push(new Computer(this, "O")); 
 		this.currentPlayer = this.getPlayer(firstPlayerNumber || 1);
@@ -24,13 +26,13 @@ var Manager = function() {
 	}
 
 	this.makeComputerMove = function() {
-		var result = minimax(this.board, this.getPlayer(2).getToken());
-		this.placeTokenOnSquare("O", result.square.x, result.square.y);
+		var result = this.minimax.getBestSquare(this.board, this.getPlayer(2));
+		this.placeTokenOnSquare(this.getPlayer(2).getToken(), result.square.x, result.square.y);
 	}
 
 	this.makeHumanMove = function() {
-		var result = minimax(this.board, this.getPlayer(1).getToken());
-		this.placeTokenOnSquare("X", result.square.x, result.square.y);
+		var result = this.minimax.getBestSquare(this.board, this.getPlayer(1));
+		this.placeTokenOnSquare(this.getPlayer(1).getToken(), result.square.x, result.square.y);
 	}
 
 	this.isThereAWinner = function() {
@@ -55,13 +57,13 @@ var Manager = function() {
 	
 	this.nextPlayersTurn = function() {
 		if (!this.isGameOver()) {
-			this.currentPlayer = this.getOtherPlayer();
+			this.currentPlayer = this.getOtherPlayer(this.currentPlayer);
 			this.makeCurrentPlayerTakeTurn();
 		}
 	}
 
-	this.getOtherPlayer = function() {
-		if (this.currentPlayer.getToken() == this.getPlayer(1).getToken()) {
+	this.getOtherPlayer = function(player) {
+		if (player.getToken() == this.getPlayer(1).getToken()) {
 			return this.getPlayer(2);
 		} else {
 			return this.getPlayer(1);
@@ -77,35 +79,55 @@ var Manager = function() {
 	}
 }
 
-var minimax = function(board, token) {
-	if (board.isGameOver()) {
+var Minimax = function(_manager) {
+	this.manager = _manager;
+
+	this.getBestSquare = function(board, player) {
+		if (board.isGameOver()) {
+			return {score: this.getScoreForGameOver(board)};
+		}
+
+		var emptySquares = board.getEmptySquares();
+		var bestSquareAndScore = {score: -1};
+
+		for (var i = 0; i < emptySquares.length; i++) {
+			var _square = emptySquares[i];
+			var clonedBoard = board.clone();
+			clonedBoard.setToken(player.getToken(), _square.x, _square.y);
+			var otherPlayer = this.manager.getOtherPlayer(player);
+			var possibleBestScore = this.getBestSquare(clonedBoard, otherPlayer).score;
+			possibleBestScore = this.reverseScoreIfForOtherPlayer(player, possibleBestScore);
+			if (possibleBestScore >= bestSquareAndScore.score) {
+				bestSquareAndScore = {square: _square, score: possibleBestScore};
+			}
+		}
+
+		bestSquareAndScore.score *= .9;
+		bestSquareAndScore.score = this.reverseScoreIfForOtherPlayer(player, bestSquareAndScore.score);
+		return bestSquareAndScore;
+	}
+
+	this.getScoreForGameOver = function(board) {
 		if (board.isThereAWinner() == "O") {
-			return {score: 1};
+			return 1;
 		} else if (board.isThereAWinner() == "X") {
-			return {score: -1};
+			return -1;
 		} else {
-			return {score: 0};
-		}
-	}
-	var modifier = (token == "X") ? -1: 1;
-	var otherToken = (token == "X") ? "O" : "X";
-
-	var emptySquares = board.getEmptySquares();
-	var bestSquareAndScore = {score: -1};
-
-	for (var i = 0; i < emptySquares.length; i++) {
-		var _square = emptySquares[i];
-		var clonedBoard = board.clone();
-		clonedBoard.setToken(token, _square.x, _square.y);
-		var possibleBestScore = minimax(clonedBoard, otherToken).score;
-		possibleBestScore *= modifier;
-		if (possibleBestScore >= bestSquareAndScore.score) {
-			bestSquareAndScore = {square: _square, score: possibleBestScore};
+			return 0;
 		}
 	}
 
-	bestSquareAndScore.score *= .9 * modifier;
-	return bestSquareAndScore;
+	this.reverseScoreIfForOtherPlayer = function(player, score) {
+		if (player.getToken() == "X") {
+			return score * -1;
+		} else {
+			return score;
+		}
+	}
+}
+
+var minimax = function(board, token) {
+
 }
 
 var Square = function(x, y) {

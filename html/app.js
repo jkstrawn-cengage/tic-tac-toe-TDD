@@ -1,10 +1,15 @@
 var controller;
 
+var playAgain = function() {
+	var model = new Manager();
+	controller.playAgain(model);
+}
+
 $(function() {
 	console.log("started");
 
 	var model = new Manager();
-	controller = new TicTacToe(model);
+	controller = new Controller(model);
 	controller.initiate();
 
 	// Set click event for each cell in the html board
@@ -16,18 +21,18 @@ $(function() {
 
 });
 
-var TicTacToe = function(_manager) {
-	this.manager = _manager;
+var Controller = function(_model) {
+	this.model = _model;
 	this.isOver = false;
 
 	this.initiate = function() {
 		this.clearBoard();
 
-		this.manager.initiate(1);
-		this.manager.startGame();
+		this.model.initiate(1);
+		this.model.startGame();
 
 		this.drawBoard();
-		
+
 		$("#status").html("");
 		this.isOver = false;
 	};
@@ -46,7 +51,7 @@ var TicTacToe = function(_manager) {
 	};
 
 	this.drawBoard = function() {
-		var board = this.manager.getBoard();
+		var board = this.model.getBoard();
 		var that = this;
 		this.forEachSquare(function(x, y) {
 			var htmlSquare = that.getHtmlSquare(x, y);
@@ -71,10 +76,10 @@ var TicTacToe = function(_manager) {
 	};
 
 	this.makeMove = function(x, y) {
-		this.manager.sendHumanMove(x, y);
-		if (this.manager.isGameOver()) {
+		this.model.sendHumanMove(x, y);
+		if (this.model.isGameOver()) {
 			this.isOver = true;
-			this.setGameOverStatus(this.manager.isThereAWinner());
+			this.setGameOverStatus(this.model.isThereAWinner());
 		}
 		this.drawBoard();
 	}
@@ -87,7 +92,7 @@ var TicTacToe = function(_manager) {
 		}
 	};
 
-	this.playAgain = function(manager) {
+	this.playAgain = function(model) {
 		this.initiate();
 	}
 
@@ -99,9 +104,4 @@ var TicTacToe = function(_manager) {
 	        $('#status').html("The computer has won!");
 	    }
 	}
-}
-
-var playAgain = function() {
-	var manager = new Manager();
-	controller.playAgain(manager);
 }
