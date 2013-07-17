@@ -26,13 +26,13 @@ var Manager = function() {
 	}
 
 	this.makeComputerMove = function() {
-		var result = this.minimax.getBestSquare(this.board, this.getPlayer(2));
-		this.placeTokenOnSquare(this.getPlayer(2).getToken(), result.square.x, result.square.y);
+		var result = this.minimax.getBestSquare(this.board, this.getPlayer(2), 1, -2, 2);
+		this.placeTokenOnSquare(this.getPlayer(2).getToken(), result.x, result.y);
 	}
 
 	this.makeHumanMove = function() {
-		var result = this.minimax.getBestSquare(this.board, this.getPlayer(1));
-		this.placeTokenOnSquare(this.getPlayer(1).getToken(), result.square.x, result.square.y);
+		var result = this.minimax.getBestSquare(this.board, this.getPlayer(1), 1, -2, 2);
+		this.placeTokenOnSquare(this.getPlayer(1).getToken(), result.x, result.y);
 	}
 
 	this.isThereAWinner = function() {
@@ -82,52 +82,42 @@ var Manager = function() {
 var Minimax = function(_manager) {
 	this.manager = _manager;
 
-	this.getBestSquare = function(board, player) {
-		if (board.isGameOver()) {
-			return {score: this.getScoreForGameOver(board)};
+	this.getBestSquare = function(board, player, depth, alpha, beta) {
+		if (board.isGameOver() || depth > 6) {
+			return {score: this.getScoreForGameOver(player, board)};
 		}
 
 		var emptySquares = board.getEmptySquares();
-		var bestSquareAndScore = {score: -1};
+		var bestMove = {x: -1, y: -1};
+		var otherPlayer = this.manager.getOtherPlayer(player);
 
 		for (var i = 0; i < emptySquares.length; i++) {
 			var _square = emptySquares[i];
 			var clonedBoard = board.clone();
 			clonedBoard.setToken(player.getToken(), _square.x, _square.y);
-			var otherPlayer = this.manager.getOtherPlayer(player);
-			var possibleBestScore = this.getBestSquare(clonedBoard, otherPlayer).score;
-			possibleBestScore = this.reverseScoreIfForOtherPlayer(player, possibleBestScore);
-			if (possibleBestScore >= bestSquareAndScore.score) {
-				bestSquareAndScore = {square: _square, score: possibleBestScore};
+			var alphaCandidate = -this.getBestSquare(clonedBoard, otherPlayer, depth + 1, -beta, -alpha).score;
+
+			if (beta <= alpha)
+				break;
+
+			if (alphaCandidate > alpha) {
+				alpha = alphaCandidate;
+				bestMove = _square;
 			}
 		}
 
-		bestSquareAndScore.score *= .9;
-		bestSquareAndScore.score = this.reverseScoreIfForOtherPlayer(player, bestSquareAndScore.score);
-		return bestSquareAndScore;
+		return {score: alpha * .95, x: bestMove.x, y: bestMove.y};
 	}
 
-	this.getScoreForGameOver = function(board) {
-		if (board.isThereAWinner() == "O") {
+	this.getScoreForGameOver = function(player, board) {
+		if (board.isThereAWinner() == player.getToken()) {
 			return 1;
-		} else if (board.isThereAWinner() == "X") {
-			return -1;
-		} else {
+		} else if (board.isThereAWinner() == false) {
 			return 0;
-		}
-	}
-
-	this.reverseScoreIfForOtherPlayer = function(player, score) {
-		if (player.getToken() == "X") {
-			return score * -1;
 		} else {
-			return score;
+			return -1;
 		}
 	}
-}
-
-var minimax = function(board, token) {
-
 }
 
 var Square = function(x, y) {
@@ -136,10 +126,7 @@ var Square = function(x, y) {
 	this.token = '';
 
 	this.isEmpty = function() {
-		if (this.token == '') {
-			return true;
-		}
-		return false;
+		return (this.token == '');
 	}
 
 	this.setToken = function(token) {
@@ -221,10 +208,7 @@ var Board = function() {
 
 	this.isGameOver = function() {
 		var emptySquares = this.getEmptySquares();
-		if (emptySquares.length == 0 || this.isThereAWinner()) {
-			return true;
-		}
-		return false;
+		return (emptySquares.length == 0 || this.isThereAWinner());
 	}
 
 	this.print = function() {
