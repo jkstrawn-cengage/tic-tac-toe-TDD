@@ -1,35 +1,35 @@
-var controller;
+var view;
 
 var playAgain = function() {
-	var model = new Manager();
-	controller.playAgain(model);
+	var controller = new Controller();
+	view.playAgain(controller);
 }
 
 $(function() {
 	console.log("started");
 
-	var model = new Manager();
-	controller = new Controller(model);
-	controller.initiate();
+	var controller = new Controller();
+	view = new View(controller);
+	view.initiate();
 
 	// Set click event for each cell in the html board
 	$("#boardTable div").each(function(){
 		this.addEventListener("click", function(e){
-			controller.clickedCell(this);
+			view.clickedCell(this);
 		}, false);
 	});
 
 });
 
-var Controller = function(_model) {
-	this.model = _model;
+var View = function(_controller) {
+	this.controller = _controller;
 	this.isOver = false;
 
 	this.initiate = function() {
 		this.clearBoard();
 
-		this.model.initiate(1);
-		this.model.startGame();
+		this.controller.initiate();
+		this.controller.startGame();
 
 		this.drawBoard();
 
@@ -51,7 +51,7 @@ var Controller = function(_model) {
 	};
 
 	this.drawBoard = function() {
-		var board = this.model.getBoard();
+		var board = this.controller.getBoard();
 		var that = this;
 		this.forEachSquare(function(x, y) {
 			var htmlSquare = that.getHtmlSquare(x, y);
@@ -76,10 +76,10 @@ var Controller = function(_model) {
 	};
 
 	this.makeMove = function(x, y) {
-		this.model.sendHumanMove(x, y);
-		if (this.model.isGameOver()) {
+		this.controller.makeMove(x, y);
+		if (this.controller.isGameOver()) {
 			this.isOver = true;
-			this.setGameOverStatus(this.model.isThereAWinner());
+			this.setGameOverStatus(this.controller.isWinner());
 		}
 		this.drawBoard();
 	}
@@ -92,7 +92,7 @@ var Controller = function(_model) {
 		}
 	};
 
-	this.playAgain = function(model) {
+	this.playAgain = function(controller) {
 		this.initiate();
 	}
 
